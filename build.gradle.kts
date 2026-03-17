@@ -1,5 +1,7 @@
 plugins {
     id("java")
+    application
+    id("org.openjfx.javafxplugin") version "0.1.0"
 }
 
 group = "org.chess"
@@ -7,6 +9,16 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+}
+
+// Revisit--patch found online--something about .kts files working differently?
+application {
+    mainClass.set("org.chess.ChessApp")
+}
+
+javafx {
+    version = "21"
+    modules = listOf("javafx.controls", "javafx.fxml")
 }
 
 dependencies {
