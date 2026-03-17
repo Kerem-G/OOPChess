@@ -1,8 +1,7 @@
-.root {
-    -fx-padding: 24;
+.board-square-beige {
+    -fx-background-color: #eeeed2;
 }
 
-.title {
-    -fx-font-size: 24px;
-    -fx-font-weight: bold;
+.board-square-olive {
+    -fx-background-color: #769656;
 }
