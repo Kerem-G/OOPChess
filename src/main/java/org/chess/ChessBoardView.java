@@ -5,12 +5,12 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 
-public class ChessBoard extends BorderPane {
+public class ChessBoardView extends BorderPane {
     private final GridPane boardGrid = new GridPane();
     private final StackPane[][] squares = new StackPane[8][8];
     private final Label[][] pieceLabels = new Label[8][8];
 
-    public ChessBoard() {
+    public ChessBoardView() {
         buildBoardGrid();
 
         setCenter(boardGrid);
