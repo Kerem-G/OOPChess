@@ -12,7 +12,9 @@ import java.util.Objects;
 public class ChessApp extends Application {
     @Override
     public void start(Stage stage) throws Exception {
-        ChessBoardView board = new ChessBoardView();
+        ChessGame game = new ChessGame();
+        ChessBoardView board = new ChessBoardView(game);
+
         Scene scene = new Scene(board);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/org/chess/styles.css")).toExternalForm());
 

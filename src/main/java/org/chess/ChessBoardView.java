@@ -9,10 +9,13 @@ public class ChessBoardView extends BorderPane {
     private final GridPane boardGrid = new GridPane();
     private final StackPane[][] squares = new StackPane[8][8];
     private final Label[][] pieceLabels = new Label[8][8];
+    private final ChessGame game;
 
-    public ChessBoardView() {
+
+    public ChessBoardView(ChessGame game) {
         buildBoardGrid();
 
+        this.game = game;
         setCenter(boardGrid);
 
         refreshBoard();
@@ -38,6 +41,8 @@ public class ChessBoardView extends BorderPane {
     }
 
     private void refreshBoard() {
+        GameBoard board = game.getBoard();
+
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 StackPane square = squares[row][col];
@@ -48,6 +53,8 @@ public class ChessBoardView extends BorderPane {
                 } else {
                     square.getStyleClass().add("board-square-olive");
                 }
+
+                pieceLabels[row][col].setText(board.textAtPosition(row, col));
             }
         }
     }
