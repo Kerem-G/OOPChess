@@ -5,3 +5,13 @@
 .board-square-olive {
     -fx-background-color: #769656;
 }
+
+.board-square-selected {
+    -fx-border-color: #1f6feb;
+    -fx-border-width: 3;
+}
+
+.board-square-legal {
+    -fx-border-color: #ff0000;
+    -fx-border-width: 2;
+}

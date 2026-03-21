@@ -6,10 +6,12 @@ import java.util.Objects;
 public class ChessPiece {
     private final PieceColor color;
     private final PieceType type;
+    private final MoveStrategy moveStrategy;
 
-    public ChessPiece(PieceColor color, PieceType type) {
+    public ChessPiece(PieceColor color, PieceType type, MoveStrategy moveStrategy) {
         this.color = color;
         this.type = type;
+        this.moveStrategy = moveStrategy;
     }
 
     public PieceColor getColor() {
@@ -21,8 +23,8 @@ public class ChessPiece {
     }
 
     // To-Do: Implement Strategy Pattern
-    public List<Objects> legalMoves(ChessBoardView board) {
-        return List.of();
+    public List<int[]> legalMoves(GameBoard board, int row, int col, ChessPiece piece) {
+        return moveStrategy.moveList(board, new int[]{row, col}, piece);
     }
 
     // To-Do: Update this to color--or better yet, image
