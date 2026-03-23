@@ -115,6 +115,37 @@ class GameBoardTest {
     }
 
     @Test
+    void testClearBoardRemovesAllPieces() {
+        GameBoard board = new GameBoard();
+        int boardSize = 8;
+        board.setupInitialPosition(factory);
+        board.clearBoard();
+        for (int row = 0; row < boardSize; row++) {
+            for (int col = 0; col < boardSize; col++) {
+                assertTrue(board.isEmpty(row, col));
+            }
+        }
+    }
+
+    @Test
+    void testFindKingReturnsKingPosition() {
+        GameBoard board = new GameBoard();
+        int row = 4, col = 4;
+        board.setPiece(row, col, factory.createPiece(PieceColor.WHITE, PieceType.KING));
+
+        int[] position = board.findKing(PieceColor.WHITE);
+
+        assertArrayEquals(new int[]{row, col}, position);
+    }
+
+    @Test
+    void testFindKingReturnsNullWhenNoKing() {
+        GameBoard board = new GameBoard();
+
+        assertNull(board.findKing(PieceColor.WHITE));
+    }
+
+    @Test
     void testSetupInitialPositionMiddleRowsEmpty() {
         GameBoard board = new GameBoard();
         board.setupInitialPosition(factory);
