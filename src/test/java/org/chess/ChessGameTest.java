@@ -1,10 +1,20 @@
 package org.chess;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class ChessGameTest {
+
+    private CheckObserver observer;
+
+    @AfterEach
+    void detach() {
+        if (observer != null) {
+            EventBus.getInstance().detach(observer);
+        }
+    }
 
     @Test
     void testInitialTurnIsWhite() {
@@ -78,5 +88,125 @@ class ChessGameTest {
         int fromRow = 6, fromCol = 0;
         int toRow = 3, toCol = 0;
         assertFalse(game.doMove(fromRow, fromCol, toRow, toCol));
+    }
+
+    @Test
+    void testIsInCheckWhenKingUnderAttack() {
+        ChessGame game = new ChessGame();
+        GameBoard board = game.getBoard();
+        ChessPieceFactory factory = new ChessPieceFactory();
+        int kingRow = 4, kingCol = 4;
+        int rookRow = 4, rookCol = 7;
+        board.setPiece(kingRow, kingCol, factory.createPiece(PieceColor.WHITE, PieceType.KING));
+        board.setPiece(rookRow, rookCol, factory.createPiece(PieceColor.BLACK, PieceType.ROOK));
+
+        assertTrue(game.isInCheck(PieceColor.WHITE));
+    }
+
+    @Test
+    void testIsNotInCheckWhenKingSafe() {
+        ChessGame game = new ChessGame();
+        GameBoard board = game.getBoard();
+        ChessPieceFactory factory = new ChessPieceFactory();
+        int kingRow = 4, kingCol = 4;
+        int rookRow = 5, rookCol = 7;
+        board.setPiece(kingRow, kingCol, factory.createPiece(PieceColor.WHITE, PieceType.KING));
+        board.setPiece(rookRow, rookCol, factory.createPiece(PieceColor.BLACK, PieceType.ROOK));
+
+        assertFalse(game.isInCheck(PieceColor.WHITE));
+    }
+
+    @Test
+    void testIsCheckmate() {
+        ChessGame game = new ChessGame();
+        GameBoard board = game.getBoard();
+        ChessPieceFactory factory = new ChessPieceFactory();
+        board.clearBoard();
+
+        // King in corner, rook covers back rank, queen covers all escape squares
+        int kingRow = 0, kingCol = 0;
+        int rookRow = 0, rookCol = 4;
+        int queenRow = 1, queenCol = 2;
+        board.setPiece(kingRow, kingCol, factory.createPiece(PieceColor.WHITE, PieceType.KING));
+        board.setPiece(rookRow, rookCol, factory.createPiece(PieceColor.BLACK, PieceType.ROOK));
+        board.setPiece(queenRow, queenCol, factory.createPiece(PieceColor.BLACK, PieceType.QUEEN));
+
+        assertTrue(game.isCheckmate());
+    }
+
+    @Test
+    void testIsStalemate() {
+        ChessGame game = new ChessGame();
+        GameBoard board = game.getBoard();
+        ChessPieceFactory factory = new ChessPieceFactory();
+        board.clearBoard();
+
+        int kingRow = 0, kingCol = 0;
+        int queenRow = 1, queenCol = 2;
+        int rookRow = 2, rookCol = 1;
+        board.setPiece(kingRow, kingCol, factory.createPiece(PieceColor.WHITE, PieceType.KING));
+        board.setPiece(queenRow, queenCol, factory.createPiece(PieceColor.BLACK, PieceType.QUEEN));
+        board.setPiece(rookRow, rookCol, factory.createPiece(PieceColor.BLACK, PieceType.ROOK));
+
+        assertTrue(game.isStalemate());
+    }
+
+    @Test
+    void testIsNotCheckmateWhenMovesAvailable() {
+        ChessGame game = new ChessGame();
+        assertFalse(game.isCheckmate());
+    }
+
+    @Test
+    void testIsNotStalemateAtStart() {
+        ChessGame game = new ChessGame();
+        assertFalse(game.isStalemate());
+    }
+
+    @Test
+    void testDoMovePostsMoveEvent() {
+        ChessGame game = new ChessGame();
+        observer = new CheckObserver();
+        EventBus.getInstance().attach(observer);
+        int fromRow = 6, fromCol = 0;
+        int toRow = 5, toCol = 0;
+
+        game.doMove(fromRow, fromCol, toRow, toCol);
+
+        assertEquals("MOVE", observer.getLastEvent());
+    }
+
+    @Test
+    void testDoMovePostsCheckEvent() {
+        ChessGame game = new ChessGame();
+        GameBoard board = game.getBoard();
+        ChessPieceFactory factory = new ChessPieceFactory();
+        board.clearBoard();
+        observer = new CheckObserver();
+        EventBus.getInstance().attach(observer);
+
+        int rookRow = 4, rookCol = 4;
+        int kingRow = 4, kingCol = 6;
+        int toRow = 4, toCol = 5;
+        board.setPiece(rookRow, rookCol, factory.createPiece(PieceColor.WHITE, PieceType.ROOK));
+        board.setPiece(kingRow, kingCol, factory.createPiece(PieceColor.BLACK, PieceType.KING));
+
+        game.doMove(rookRow, rookCol, toRow, toCol);
+
+        assertEquals("CHECK", observer.getLastEvent());
+    }
+
+    @Test
+    void testMoveIntoCheckIsIllegal() {
+        ChessGame game = new ChessGame();
+        GameBoard board = game.getBoard();
+        ChessPieceFactory factory = new ChessPieceFactory();
+        int kingRow = 4, kingCol = 4;
+        int rookRow = 4, rookCol = 7;
+        board.setPiece(kingRow, kingCol, factory.createPiece(PieceColor.WHITE, PieceType.KING));
+        board.setPiece(rookRow, rookCol, factory.createPiece(PieceColor.BLACK, PieceType.ROOK));
+
+        assertTrue(game.legalMoves(kingRow, kingCol).stream()
+                .noneMatch(m -> m[0] == kingRow));
     }
 }

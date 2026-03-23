@@ -1,7 +1,7 @@
 package org.chess;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class ChessGame {
     private final GameBoard board;
@@ -34,15 +34,23 @@ public class ChessGame {
             return false;
         }
 
-        List<int[]> legalMoves = piece.legalMoves(board, rowFrom, colFrom, piece);
-        if (!containsSquare(legalMoves, rowTo, colTo)) {
+        List<int[]> moves = legalMoves(rowFrom, colFrom);
+        if (!containsSquare(moves, rowTo, colTo)) {
             return false;
         }
 
-        // To-Do: Add command and observer patterns here
-
         board.movePiece(rowFrom, colFrom, rowTo, colTo);
         currentTurn = currentTurn.opposite();
+
+        EventBus.getInstance().postEvent("MOVE");
+        if (isCheckmate()) {
+            EventBus.getInstance().postEvent("CHECKMATE");
+        } else if (isStalemate()) {
+            EventBus.getInstance().postEvent("STALEMATE");
+        } else if (isInCheck(currentTurn)) {
+            EventBus.getInstance().postEvent("CHECK");
+        }
+
         return true;
     }
 
@@ -55,11 +63,69 @@ public class ChessGame {
         return false;
     }
 
-    public List<int[]> legalMoves(int row, int col){
+    public boolean isInCheck(PieceColor color) {
+        int[] kingPosition = board.findKing(color);
+        if (kingPosition == null) {
+            return false;
+        }
+        int kingRow = kingPosition[0];
+        int kingCol = kingPosition[1];
+
+        for (int row = 0; row < GameBoard.BOARD_SIZE; row++) {
+            for (int col = 0; col < GameBoard.BOARD_SIZE; col++) {
+                ChessPiece piece = board.getPiece(row, col);
+                if (piece != null && piece.getColor() != color) {
+                    List<int[]> moves = piece.legalMoves(board, row, col, piece);
+                    if (containsSquare(moves, kingRow, kingCol)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean isCheckmate() {
+        return isInCheck(currentTurn) && hasNoLegalMoves();
+    }
+
+    public boolean isStalemate() {
+        return !isInCheck(currentTurn) && hasNoLegalMoves();
+    }
+
+    private boolean hasNoLegalMoves() {
+        for (int row = 0; row < GameBoard.BOARD_SIZE; row++) {
+            for (int col = 0; col < GameBoard.BOARD_SIZE; col++) {
+                ChessPiece piece = board.getPiece(row, col);
+                if (piece != null && piece.getColor() == currentTurn) {
+                    if (!legalMoves(row, col).isEmpty()) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    public List<int[]> legalMoves(int row, int col) {
         ChessPiece piece = board.getPiece(row, col);
         if (piece == null || piece.getColor() != currentTurn) {
             return List.of();
         }
-        return piece.legalMoves(board, row, col, piece);
+
+        List<int[]> candidateMoves = piece.legalMoves(board, row, col, piece);
+        List<int[]> safeMoves = new ArrayList<>();
+
+        for (int[] move : candidateMoves) {
+            ChessPiece captured = board.getPiece(move[0], move[1]);
+            board.movePiece(row, col, move[0], move[1]);
+            if (!isInCheck(piece.getColor())) {
+                safeMoves.add(move);
+            }
+            board.movePiece(move[0], move[1], row, col);
+            board.setPiece(move[0], move[1], captured);
+        }
+
+        return safeMoves;
     }
 }
