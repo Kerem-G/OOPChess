@@ -4,13 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PawnStrategy implements MoveStrategy {
+    private static final int WHITE_START_ROW = 6;
+    private static final int BLACK_START_ROW = 1;
+
     public List<int[]> moveList(GameBoard board, int[] position, ChessPiece piece) {
         List<int[]> moves = new ArrayList<>();
 
         int row = position[0];
         int col = position[1];
         int direction = piece.getColor() == PieceColor.WHITE ? -1 : 1;
-        int startRow = piece.getColor() == PieceColor.WHITE ? 6 : 1;
+        int startRow = piece.getColor() == PieceColor.WHITE ? WHITE_START_ROW : BLACK_START_ROW;
 
         int oneStepRow = row + direction;
         if (isInBounds(oneStepRow, col) && board.isEmpty(oneStepRow, col)) {
@@ -43,6 +46,6 @@ public class PawnStrategy implements MoveStrategy {
     }
 
     private boolean isInBounds(int row, int col) {
-        return row >= 0 && row < 8 && col >= 0 && col < 8;
+        return row >= 0 && row < GameBoard.BOARD_SIZE && col >= 0 && col < GameBoard.BOARD_SIZE;
     }
 }
