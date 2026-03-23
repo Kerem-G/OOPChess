@@ -9,7 +9,12 @@
 
 A fully playable two-player chess game built with JavaFX, designed to demonstrate core object-oriented design principles and patterns. The game enforces legal moves for all pieces, detects check, checkmate, and stalemate, and notifies observers of game events through an event bus.
 
-To run the project:
+To run the project if the project has never been run before:
+```
+./gradlew build
+```
+
+To run the project after it has been run before:
 ```
 ./gradlew run
 ```
@@ -51,7 +56,7 @@ To run the project:
 - `EventBus` depends on `GameObserver` (interface), never on `CheckObserver` directly.
 
 **Polymorphism:**
-- Calling `piece.legalMoves()` on any `ChessPiece` produces correct movement for that piece type at runtime. A rook slides straight, a knight jumps in an L shape, a pawn moves forward and captures diagonally, all through the same method call.
+- Calling `exampleChessPiece.legalMoves()` on any `ChessPiece` produces correct movement for that piece type at runtime. A rook slides straight, a knight jumps in an L shape, a pawn moves forward and captures diagonally, all through the same method call.
 - `RookStrategy`, `BishopStrategy`, and `QueenStrategy` all extend `SlidingMoveStrategy`, inheriting shared sliding logic while each overriding `moveList()` with their own direction sets.
 
 **Dependency injection:**
@@ -80,7 +85,7 @@ Tests are located in `src/test/java/org/chess/` and cover all non-GUI classes. K
 
 ---
 
-## Assumptions
+## Future Work
 
 - Castling and en passant are planned for a future milestone.
 - Piece images are planned; pieces are currently displayed as letters (uppercase = white, lowercase = black).
