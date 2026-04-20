@@ -2,18 +2,24 @@ package org.chess.pieces;
 
 import org.chess.GameBoard;
 import org.chess.strategies.MoveStrategy;
-
+import javafx.scene.image.ImageView;
 import java.util.List;
 
 public class ChessPiece {
     private final PieceColor color;
     private final PieceType type;
     private final MoveStrategy moveStrategy;
+    private final PieceRenderer renderer;
 
-    public ChessPiece(PieceColor color, PieceType type, MoveStrategy moveStrategy) {
+    public ChessPiece(PieceColor color, PieceType type, MoveStrategy moveStrategy, PieceRenderer renderer) {
         this.color = color;
         this.type = type;
         this.moveStrategy = moveStrategy;
+        this.renderer = renderer;
+    }
+
+    public ImageView render() {
+        return renderer.render();
     }
 
     public PieceColor getColor() {
@@ -26,11 +32,5 @@ public class ChessPiece {
 
     public List<int[]> legalMoves(GameBoard board, int row, int col, ChessPiece piece) {
         return moveStrategy.moveList(board, new int[]{row, col}, piece);
-    }
-
-    // To-Do: Update this to image
-    public String displayText() {
-        char letter = type.getLetter();
-        return color == PieceColor.WHITE ? String.valueOf(letter) : String.valueOf(Character.toLowerCase(letter));
     }
 }

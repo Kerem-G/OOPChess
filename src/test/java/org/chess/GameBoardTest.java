@@ -37,21 +37,6 @@ class GameBoardTest {
     }
 
     @Test
-    void testTextAtPositionEmptySquare() {
-        GameBoard board = new GameBoard();
-        int row = 3, col = 3;
-        assertEquals("", board.textAtPosition(row, col));
-    }
-
-    @Test
-    void testTextAtPositionWithPiece() {
-        GameBoard board = new GameBoard();
-        int row = 3, col = 3;
-        board.setPiece(row, col, factory.createPiece(PieceColor.WHITE, PieceType.QUEEN));
-        assertEquals("Q", board.textAtPosition(row, col));
-    }
-
-    @Test
     void testMovePiecePieceAtDestination() {
         GameBoard board = new GameBoard();
         int fromRow = 0, fromCol = 0;

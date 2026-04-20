@@ -1,6 +1,5 @@
 package org.chess;
 
-import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
@@ -12,7 +11,6 @@ import java.util.List;
 public class ChessBoardView extends BorderPane {
     private final GridPane boardGrid = new GridPane();
     private final StackPane[][] squares = new StackPane[8][8];
-    private final Label[][] pieceLabels = new Label[8][8];
     private final ChessGame game;
     private int[] selectedPosition;
     private List<int[]> legalTargets = List.of();
@@ -30,8 +28,8 @@ public class ChessBoardView extends BorderPane {
     private void buildBoardGrid() {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
-                Label pieceLabel = new Label("T");
-                StackPane square = new StackPane(pieceLabel);
+                StackPane square = new StackPane();
+                square.getChildren().clear();
 
                 square.setMinSize(72, 72);
                 square.setPrefSize(72, 72);
@@ -41,7 +39,6 @@ public class ChessBoardView extends BorderPane {
                 square.setOnMouseClicked(event -> onSquareClicked(currentRow, currentCol));
 
                 squares[row][col] = square;
-                pieceLabels[row][col] = pieceLabel;
                 boardGrid.add(square, col, row);
             }
         }
@@ -89,6 +86,7 @@ public class ChessBoardView extends BorderPane {
             for (int col = 0; col < 8; col++) {
                 StackPane square = squares[row][col];
                 square.getStyleClass().clear();
+                square.getChildren().clear();
 
                 if ((row + col) % 2 == 0) {
                     square.getStyleClass().add("board-square-beige");
@@ -102,7 +100,10 @@ public class ChessBoardView extends BorderPane {
                     square.getStyleClass().add("board-square-legal");
                 }
 
-                pieceLabels[row][col].setText(board.textAtPosition(row, col));
+                ChessPiece piece = board.getPiece(row, col);
+                if (piece != null) {
+                    square.getChildren().add(piece.render());
+                }
             }
         }
     }
