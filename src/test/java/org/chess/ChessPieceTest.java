@@ -1,5 +1,9 @@
 package org.chess;
 
+import org.chess.pieces.ChessPiece;
+import org.chess.pieces.ChessPieceFactory;
+import org.chess.pieces.PieceColor;
+import org.chess.pieces.PieceType;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

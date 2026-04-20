@@ -1,4 +1,7 @@
-package org.chess;
+package org.chess.strategies;
+
+import org.chess.pieces.ChessPiece;
+import org.chess.GameBoard;
 
 import java.util.ArrayList;
 import java.util.List;
