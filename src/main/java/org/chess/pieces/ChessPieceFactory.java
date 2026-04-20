@@ -18,6 +18,6 @@ public class ChessPieceFactory {
     }
 
     public ChessPiece createPiece(PieceColor color, PieceType type) {
-        return new ChessPiece(color, type, strategies.get(type));
+        return new ChessPiece(color, type, strategies.get(type), new ImagePieceRenderer(color, type));
     }
 }

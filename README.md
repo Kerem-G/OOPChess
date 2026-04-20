@@ -89,3 +89,7 @@ Tests are located in `src/test/java/org/chess/` and cover all non-GUI classes. K
 
 - Castling and en passant are planned for a future milestone.
 - Piece images are planned; pieces are currently displayed as letters (uppercase = white, lowercase = black).
+
+## Attributions
+
+The icons for the chess pieces were taken from Green Chess with permission under a Creative Commons Attribute and Share Alike license. The link to the website can be found here: https://greenchess.net/info.php?item=downloads

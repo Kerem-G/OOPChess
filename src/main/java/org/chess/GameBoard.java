@@ -38,10 +38,6 @@ public class GameBoard {
         return getPiece(row, col) == null;
     }
 
-    public String textAtPosition(int row, int col) {
-        return getPiece(row, col) == null ? "" : getPiece(row, col).displayText();
-    }
-
     public void movePiece(int rowFrom, int colFrom, int rowTo, int colTo) {
         ChessPiece movingPiece = getPiece(rowFrom, colFrom);
         setPiece(rowTo, colTo, movingPiece);
