@@ -1,21 +1,28 @@
 package org.chess;
 
+import org.chess.commands.ChessCommand;
+import org.chess.commands.CommandFactory;
 import org.chess.observers.EventBus;
 import org.chess.pieces.ChessPiece;
 import org.chess.pieces.ChessPieceFactory;
 import org.chess.pieces.PieceColor;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 public class ChessGame {
     private final GameBoard board;
     private final ChessPieceFactory pieceFactory;
+    private final CommandFactory commandFactory;
     private PieceColor currentTurn;
+    private final Deque<ChessCommand> history = new ArrayDeque<>();
 
     public ChessGame() {
         this.board = new GameBoard();
         this.pieceFactory = new ChessPieceFactory();
+        this.commandFactory = new CommandFactory();
         this.currentTurn = PieceColor.WHITE;
         board.setupInitialPosition(pieceFactory);
     }
@@ -44,10 +51,12 @@ public class ChessGame {
             return false;
         }
 
-        board.movePiece(rowFrom, colFrom, rowTo, colTo);
+        ChessCommand command = commandFactory.newMoveCommand(this.board,rowFrom, colFrom, rowTo, colTo);
+        command.execute();
+        history.push(command);
         currentTurn = currentTurn.opposite();
-
         EventBus.getInstance().postEvent("MOVE");
+
         if (isCheckmate()) {
             EventBus.getInstance().postEvent("CHECKMATE");
         } else if (isStalemate()) {
@@ -57,6 +66,16 @@ public class ChessGame {
         }
 
         return true;
+    }
+    public boolean undoMove() {
+        if (!history.isEmpty()) {
+            ChessCommand command = history.pop();
+            command.undo();
+            currentTurn = currentTurn.opposite();
+            EventBus.getInstance().postEvent("UNDO");
+            return true;
+        }
+        return false;
     }
 
     private boolean containsSquare(List<int[]> squares, int row, int col) {
