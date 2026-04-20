@@ -1,4 +1,4 @@
-package org.chess;
+package org.chess.observers;
 
 public class CheckObserver implements GameObserver {
     private String lastEvent = "";

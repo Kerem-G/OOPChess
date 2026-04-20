@@ -1,5 +1,10 @@
 package org.chess;
 
+import org.chess.pieces.ChessPiece;
+import org.chess.pieces.ChessPieceFactory;
+import org.chess.pieces.PieceColor;
+import org.chess.pieces.PieceType;
+
 public class GameBoard {
     public static final int BOARD_SIZE = 8;
 

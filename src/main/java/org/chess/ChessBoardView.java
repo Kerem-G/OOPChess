@@ -4,6 +4,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import org.chess.pieces.ChessPiece;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,7 +28,6 @@ public class ChessBoardView extends BorderPane {
     }
 
     private void buildBoardGrid() {
-        // Note: Avoiding dealing with square styles here to prevent repeat in refreshBoard which will need to deal with UI changes for available moves
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 Label pieceLabel = new Label("T");

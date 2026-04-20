@@ -1,9 +1,12 @@
-package org.chess;
+package org.chess.strategies;
+
+import org.chess.pieces.ChessPiece;
+import org.chess.GameBoard;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class KnightStrategy implements MoveStrategy {
+public class KingStrategy implements MoveStrategy {
     @Override
     public List<int[]> moveList(GameBoard board, int[] position, ChessPiece piece) {
         List<int[]> moves = new ArrayList<>();
@@ -12,8 +15,9 @@ public class KnightStrategy implements MoveStrategy {
         int col = position[1];
 
         int[][] offsets = new int[][]{
-                {-2, -1}, {-2, 1}, {2, -1}, {2, 1},
-                {-1, -2}, {-1, 2}, {1, -2}, {1, 2}
+                {-1, -1}, {-1, 0}, {-1, 1},
+                { 0, -1},          { 0, 1},
+                { 1, -1}, { 1, 0}, { 1, 1}
         };
 
         for (int[] offset : offsets) {

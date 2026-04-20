@@ -1,5 +1,10 @@
 package org.chess;
 
+import org.chess.observers.EventBus;
+import org.chess.pieces.ChessPiece;
+import org.chess.pieces.ChessPieceFactory;
+import org.chess.pieces.PieceColor;
+
 import java.util.ArrayList;
 import java.util.List;
 

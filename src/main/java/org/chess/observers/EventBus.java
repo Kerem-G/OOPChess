@@ -1,4 +1,4 @@
-package org.chess;
+package org.chess.observers;
 
 import java.util.ArrayList;
 import java.util.List;
