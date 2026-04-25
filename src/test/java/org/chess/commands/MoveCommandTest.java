@@ -1,7 +1,6 @@
-package org.chess;
+package org.chess.commands;
 
 import org.chess.GameBoard;
-import org.chess.commands.MoveCommand;
 import org.chess.pieces.ChessPiece;
 import org.chess.pieces.ChessPieceFactory;
 import org.chess.pieces.PieceColor;
@@ -55,5 +54,31 @@ class MoveCommandTest {
 
         assertEquals(rook, board.getPiece(0, 0));
         assertEquals(pawn, board.getPiece(4, 0));
+    }
+
+    @Test
+    void testExecuteSetsHasMoved() {
+        GameBoard board = new GameBoard();
+        ChessPiece rook = factory.createPiece(PieceColor.WHITE, PieceType.ROOK);
+        board.setPiece(0, 0, rook);
+
+        MoveCommand command = new MoveCommand(board, 0, 0, 4, 0);
+        command.execute();
+
+        assertTrue(rook.hasMoved());
+    }
+
+    @Test
+    void testUndoRestoresPriorHasMoved() {
+        GameBoard board = new GameBoard();
+        ChessPiece rook = factory.createPiece(PieceColor.WHITE, PieceType.ROOK);
+        rook.setHasMoved(true);
+        board.setPiece(0, 0, rook);
+
+        MoveCommand command = new MoveCommand(board, 0, 0, 4, 0);
+        command.execute();
+        command.undo();
+
+        assertTrue(rook.hasMoved());
     }
 }

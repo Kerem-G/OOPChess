@@ -2,6 +2,7 @@ package org.chess;
 
 import org.chess.observers.CheckObserver;
 import org.chess.observers.EventBus;
+import org.chess.pieces.ChessPiece;
 import org.chess.pieces.ChessPieceFactory;
 import org.chess.pieces.PieceColor;
 import org.chess.pieces.PieceType;
@@ -213,5 +214,131 @@ class ChessGameTest {
 
         assertTrue(game.legalMoves(kingRow, kingCol).stream()
                 .noneMatch(m -> m[0] == kingRow));
+    }
+
+    @Test
+    void testUndoMoveReversesMove() {
+        ChessGame game = new ChessGame();
+        ChessPiece pawn = game.getBoard().getPiece(6, 0);
+        game.doMove(6, 0, 5, 0);
+
+        assertTrue(game.undoMove());
+        assertSame(pawn, game.getBoard().getPiece(6, 0));
+        assertNull(game.getBoard().getPiece(5, 0));
+        assertEquals(PieceColor.WHITE, game.getCurrentTurn());
+    }
+
+    @Test
+    void testUndoMoveReturnsFalseOnEmptyHistory() {
+        ChessGame game = new ChessGame();
+        assertFalse(game.undoMove());
+    }
+
+    @Test
+    void testUndoMoveAfterCaptureRestoresPieces() {
+        ChessGame game = new ChessGame();
+        GameBoard board = game.getBoard();
+        ChessPieceFactory factory = new ChessPieceFactory();
+        board.clearBoard();
+
+        ChessPiece whitePawn = factory.createPiece(PieceColor.WHITE, PieceType.PAWN);
+        ChessPiece blackPawn = factory.createPiece(PieceColor.BLACK, PieceType.PAWN);
+        board.setPiece(4, 4, whitePawn);
+        board.setPiece(3, 5, blackPawn);
+
+        game.doMove(4, 4, 3, 5);
+        game.undoMove();
+
+        assertSame(whitePawn, board.getPiece(4, 4));
+        assertSame(blackPawn, board.getPiece(3, 5));
+    }
+
+    @Test
+    void testRedoMoveReExecutesUndoneMove() {
+        ChessGame game = new ChessGame();
+        ChessPiece pawn = game.getBoard().getPiece(6, 0);
+        game.doMove(6, 0, 5, 0);
+        game.undoMove();
+
+        assertTrue(game.redoMove());
+        assertSame(pawn, game.getBoard().getPiece(5, 0));
+        assertNull(game.getBoard().getPiece(6, 0));
+        assertEquals(PieceColor.BLACK, game.getCurrentTurn());
+    }
+
+    @Test
+    void testRedoMoveReturnsFalseOnEmptyStack() {
+        ChessGame game = new ChessGame();
+        assertFalse(game.redoMove());
+    }
+
+    @Test
+    void testNewMoveClearsRedoStack() {
+        ChessGame game = new ChessGame();
+        game.doMove(6, 0, 5, 0);
+        game.undoMove();
+        game.doMove(6, 1, 5, 1);
+
+        assertFalse(game.redoMove());
+    }
+
+    @Test
+    void testDoMovePromotesPawnToChosenPiece() {
+        ChessGame game = new ChessGame();
+        GameBoard board = game.getBoard();
+        ChessPieceFactory factory = new ChessPieceFactory();
+        board.clearBoard();
+        board.setPiece(1, 4, factory.createPiece(PieceColor.WHITE, PieceType.PAWN));
+
+        assertTrue(game.doMove(1, 4, 0, 4, PieceType.ROOK));
+
+        ChessPiece promoted = board.getPiece(0, 4);
+        assertNotNull(promoted);
+        assertEquals(PieceType.ROOK, promoted.getType());
+    }
+
+    @Test
+    void testIsPromotionTrueForPawnReachingBackRank() {
+        ChessGame game = new ChessGame();
+        GameBoard board = game.getBoard();
+        ChessPieceFactory factory = new ChessPieceFactory();
+        board.clearBoard();
+        board.setPiece(1, 4, factory.createPiece(PieceColor.WHITE, PieceType.PAWN));
+
+        assertTrue(game.isPromotion(1, 4, 0));
+    }
+
+    @Test
+    void testIsPromotionFalseForRegularMove() {
+        ChessGame game = new ChessGame();
+        assertFalse(game.isPromotion(6, 0, 5));
+    }
+
+    @Test
+    void testLegalMovesIncludesCastleSquare() {
+        ChessGame game = new ChessGame();
+        GameBoard board = game.getBoard();
+        ChessPieceFactory factory = new ChessPieceFactory();
+        board.clearBoard();
+        board.setPiece(7, 4, factory.createPiece(PieceColor.WHITE, PieceType.KING));
+        board.setPiece(7, 7, factory.createPiece(PieceColor.WHITE, PieceType.ROOK));
+
+        assertTrue(game.legalMoves(7, 4).stream()
+                .anyMatch(m -> m[0] == 7 && m[1] == 6));
+    }
+
+    @Test
+    void testLegalMovesExcludesCastleAfterKingMoved() {
+        ChessGame game = new ChessGame();
+        GameBoard board = game.getBoard();
+        ChessPieceFactory factory = new ChessPieceFactory();
+        board.clearBoard();
+        ChessPiece king = factory.createPiece(PieceColor.WHITE, PieceType.KING);
+        king.setHasMoved(true);
+        board.setPiece(7, 4, king);
+        board.setPiece(7, 7, factory.createPiece(PieceColor.WHITE, PieceType.ROOK));
+
+        assertFalse(game.legalMoves(7, 4).stream()
+                .anyMatch(m -> m[0] == 7 && m[1] == 6));
     }
 }
