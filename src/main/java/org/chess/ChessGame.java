@@ -19,6 +19,7 @@ public class ChessGame {
     private final CommandFactory commandFactory;
     private PieceColor currentTurn;
     private final Deque<ChessCommand> history = new ArrayDeque<>();
+    private final Deque<ChessCommand> redoStack = new ArrayDeque<>();
 
     private static final int KINGSIDE_ROOK_COL = 7;
     private static final int KINGSIDE_KING_DEST_COL = 6;
@@ -91,6 +92,7 @@ public class ChessGame {
         ChessCommand command = commandFactory.newCommand(this.board, rowFrom, colFrom, rowTo, colTo, promotionChoice);
         command.execute();
         history.push(command);
+        redoStack.clear();
         currentTurn = currentTurn.opposite();
         EventBus.getInstance().postEvent("MOVE");
 
@@ -113,8 +115,21 @@ public class ChessGame {
         if (!history.isEmpty()) {
             ChessCommand command = history.pop();
             command.undo();
+            redoStack.push(command);
             currentTurn = currentTurn.opposite();
             EventBus.getInstance().postEvent("UNDO");
+            return true;
+        }
+        return false;
+    }
+
+    public boolean redoMove() {
+        if (!redoStack.isEmpty()) {
+            ChessCommand command = redoStack.pop();
+            command.execute();
+            history.push(command);
+            currentTurn = currentTurn.opposite();
+            EventBus.getInstance().postEvent("REDO");
             return true;
         }
         return false;

@@ -2,6 +2,7 @@ package org.chess;
 
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import org.chess.pieces.ChessPiece;
 import javafx.scene.control.Button;
@@ -32,9 +33,15 @@ public class ChessBoardView extends BorderPane {
 
         this.game = game;
         setCenter(boardGrid);
-        setTop(buildUndoButton());
+        setTop(buildButtonBar());
 
         refreshBoard();
+    }
+
+    private HBox buildButtonBar() {
+        HBox bar = new HBox(8);
+        bar.getChildren().addAll(buildUndoButton(), buildRedoButton());
+        return bar;
     }
 
     private Button buildUndoButton() {
@@ -53,6 +60,25 @@ public class ChessBoardView extends BorderPane {
             refreshBoard();
         });
         return undoButton;
+    }
+
+    private Button buildRedoButton() {
+        ImageView icon = new ImageView(new Image(getClass().getResourceAsStream("/org/chess/icons/undo.png")));
+        icon.setFitWidth(24);
+        icon.setFitHeight(24);
+        icon.setPreserveRatio(true);
+        icon.setScaleX(-1);
+
+        Button redoButton = new Button();
+        redoButton.setGraphic(icon);
+        redoButton.setTooltip(new Tooltip("Redo"));
+        redoButton.setOnAction(event -> {
+            game.redoMove();
+            selectedPosition = null;
+            legalTargets = List.of();
+            refreshBoard();
+        });
+        return redoButton;
     }
 
     private void buildBoardGrid() {
