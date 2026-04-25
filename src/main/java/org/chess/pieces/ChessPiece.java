@@ -10,6 +10,7 @@ public class ChessPiece {
     private final PieceType type;
     private final MoveStrategy moveStrategy;
     private final PieceRenderer renderer;
+    private boolean hasMoved = false;
 
     public ChessPiece(PieceColor color, PieceType type, MoveStrategy moveStrategy, PieceRenderer renderer) {
         this.color = color;
@@ -28,6 +29,14 @@ public class ChessPiece {
 
     public PieceType getType() {
         return type;
+    }
+
+    public boolean hasMoved() {
+        return hasMoved;
+    }
+
+    public void setHasMoved(boolean hasMoved) {
+        this.hasMoved = hasMoved;
     }
 
     public List<int[]> legalMoves(GameBoard board, int row, int col, ChessPiece piece) {

@@ -6,6 +6,7 @@ import org.chess.observers.EventBus;
 import org.chess.pieces.ChessPiece;
 import org.chess.pieces.ChessPieceFactory;
 import org.chess.pieces.PieceColor;
+import org.chess.pieces.PieceType;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -19,10 +20,42 @@ public class ChessGame {
     private PieceColor currentTurn;
     private final Deque<ChessCommand> history = new ArrayDeque<>();
 
+    private static final int KINGSIDE_ROOK_COL = 7;
+    private static final int KINGSIDE_KING_DEST_COL = 6;
+    private static final int QUEENSIDE_ROOK_COL = 0;
+    private static final int QUEENSIDE_KING_DEST_COL = 2;
+
+    private void addCastlingMoves(List<int[]> safeMoves, int row, int col) {
+        ChessPiece king = board.getPiece(row, col);
+        if (king == null || king.getType() != PieceType.KING || king.hasMoved()) {
+            return;
+        }
+        if (canCastleSide(row, KINGSIDE_ROOK_COL, new int[]{5, 6}, king.getColor())) {
+            safeMoves.add(new int[]{row, KINGSIDE_KING_DEST_COL});
+        }
+        if (canCastleSide(row, QUEENSIDE_ROOK_COL, new int[]{1, 2, 3}, king.getColor())) {
+            safeMoves.add(new int[]{row, QUEENSIDE_KING_DEST_COL});
+        }
+    }
+
+    private boolean canCastleSide(int row, int rookCol, int[] squaresBetween, PieceColor color) {
+        ChessPiece rook = board.getPiece(row, rookCol);
+        if (rook == null || rook.getType() != PieceType.ROOK
+                || rook.hasMoved() || rook.getColor() != color) {
+            return false;
+        }
+        for (int between : squaresBetween) {
+            if (board.getPiece(row, between) != null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public ChessGame() {
         this.board = new GameBoard();
         this.pieceFactory = new ChessPieceFactory();
-        this.commandFactory = new CommandFactory();
+        this.commandFactory = new CommandFactory(pieceFactory);
         this.currentTurn = PieceColor.WHITE;
         board.setupInitialPosition(pieceFactory);
     }
@@ -36,6 +69,10 @@ public class ChessGame {
     }
 
     public boolean doMove(int rowFrom, int colFrom, int rowTo, int colTo) {
+        return doMove(rowFrom, colFrom, rowTo, colTo, PieceType.QUEEN);
+    }
+
+    public boolean doMove(int rowFrom, int colFrom, int rowTo, int colTo, PieceType promotionChoice) {
         ChessPiece piece = board.getPiece(rowFrom, colFrom);
 
         if (piece == null) {
@@ -51,7 +88,7 @@ public class ChessGame {
             return false;
         }
 
-        ChessCommand command = commandFactory.newMoveCommand(this.board,rowFrom, colFrom, rowTo, colTo);
+        ChessCommand command = commandFactory.newCommand(this.board, rowFrom, colFrom, rowTo, colTo, promotionChoice);
         command.execute();
         history.push(command);
         currentTurn = currentTurn.opposite();
@@ -67,6 +104,11 @@ public class ChessGame {
 
         return true;
     }
+
+    public boolean isPromotion(int rowFrom, int colFrom, int rowTo) {
+        return commandFactory.isPromotion(board, rowFrom, colFrom, rowTo);
+    }
+
     public boolean undoMove() {
         if (!history.isEmpty()) {
             ChessCommand command = history.pop();
@@ -150,6 +192,7 @@ public class ChessGame {
             board.setPiece(move[0], move[1], captured);
         }
 
+        addCastlingMoves(safeMoves, row, col);
         return safeMoves;
     }
 }

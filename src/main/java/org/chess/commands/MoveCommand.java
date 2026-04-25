@@ -10,6 +10,7 @@ public class MoveCommand implements ChessCommand{
     private final int rowTo;
     private final int colTo;
     private ChessPiece capturedPiece;
+    private boolean previousHasMoved;
 
     public MoveCommand(GameBoard board, int rowFrom, int colFrom, int rowTo, int colTo) {
         this.board = board;
@@ -21,12 +22,18 @@ public class MoveCommand implements ChessCommand{
 
     @Override
     public void execute() {
+        ChessPiece movingPiece = board.getPiece(rowFrom, colFrom);
         capturedPiece = board.getPiece(rowTo, colTo);
+        previousHasMoved = movingPiece.hasMoved();
         board.movePiece(rowFrom, colFrom, rowTo, colTo);
+        movingPiece.setHasMoved(true);
     }
+
     @Override
     public void undo() {
+        ChessPiece movingPiece = board.getPiece(rowTo, colTo);
         board.movePiece(rowTo, colTo, rowFrom, colFrom);
         board.setPiece(rowTo, colTo, capturedPiece);
+        movingPiece.setHasMoved(previousHasMoved);
     }
 }
