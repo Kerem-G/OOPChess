@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -23,6 +24,7 @@ import java.util.List;
 public class ChessBoardView extends BorderPane {
     private final GridPane boardGrid = new GridPane();
     private final StackPane[][] squares = new StackPane[8][8];
+    private final Label statusLabel = new Label();
     private final ChessGame game;
     private int[] selectedPosition;
     private List<int[]> legalTargets = List.of();
@@ -40,8 +42,12 @@ public class ChessBoardView extends BorderPane {
 
     private HBox buildButtonBar() {
         HBox bar = new HBox(8);
-        bar.getChildren().addAll(buildUndoButton(), buildRedoButton());
+        bar.getChildren().addAll(buildUndoButton(), buildRedoButton(), statusLabel);
         return bar;
+    }
+
+    public void setStatusText(String text) {
+        statusLabel.setText(text);
     }
 
     private Button buildUndoButton() {
