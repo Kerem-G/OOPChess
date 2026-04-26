@@ -3,6 +3,8 @@ package org.chess;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.chess.observers.EventBus;
+import org.chess.observers.NotificationObserver;
 
 import java.util.Objects;
 
@@ -12,6 +14,7 @@ public class ChessApp extends Application {
     public void start(Stage stage) throws Exception {
         ChessGame game = new ChessGame();
         ChessBoardView board = new ChessBoardView(game);
+        EventBus.getInstance().attach(new NotificationObserver(game, board::setStatusText));
 
         Scene scene = new Scene(board);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/org/chess/styles.css")).toExternalForm());

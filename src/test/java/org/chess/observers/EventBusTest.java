@@ -1,7 +1,5 @@
-package org.chess;
+package org.chess.observers;
 
-import org.chess.observers.EventBus;
-import org.chess.observers.GameObserver;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 

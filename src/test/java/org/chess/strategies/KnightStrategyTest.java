@@ -1,5 +1,6 @@
-package org.chess;
+package org.chess.strategies;
 
+import org.chess.GameBoard;
 import org.chess.pieces.ChessPiece;
 import org.chess.pieces.ChessPieceFactory;
 import org.chess.pieces.PieceColor;
